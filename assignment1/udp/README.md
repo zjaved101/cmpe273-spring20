@@ -1,5 +1,6 @@
 # Assignment 1 - Part B
 
+You will be adding package lost detection and reliable message delivery to UDP.
 
 # Requirements
 
