@@ -1,4 +1,5 @@
 import socket
+import asyncio
 
 
 TCP_IP = '127.0.0.1'
@@ -20,4 +21,21 @@ def get_client_id():
     return id
 
 
-send(get_client_id())
+# send(get_client_id())
+
+async def main():
+    # id = get_client_id()
+    # reader, writer = await asyncio.open_connection(TCP_IP, TCP_PORT)
+
+    for id in range(0, 100):
+        reader, writer = await asyncio.open_connection(TCP_IP, TCP_PORT)
+        message = "%s:ping" % (id)
+        writer.write(message.encode())
+        data = await reader.read(BUFFER_SIZE)
+        print("Received data:%s" % data.decode())
+
+        writer.close()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
