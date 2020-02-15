@@ -23,8 +23,6 @@ def listen_forever():
 
     conn.close()
 
-# listen_forever()
-
 def listen():
     '''
         Listens for connections coming from clients
