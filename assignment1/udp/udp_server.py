@@ -18,20 +18,24 @@ def listen_forever():
         s.sendto(MESSAGE.encode(), ip)
 
 async def handleClient(udpSocket, ip, data):
-    sequence = 0
     print("{}: {}".format(ip, data.decode(encoding="utf-8").strip()))
-    udpSocket.sendto(MESSAGE.encode(), ip)
+    split = data.decode().split(':')
+    # print("SEQUENCE: {}".format(split[1]))
+    # udpSocket.sendto(split[1].encode(), ip)
+    # split = ['1','0',split[-1]]
+    udpSocket.sendto(':'.join(split[0:2]).encode(), ip)
 
 async def main():
+    print("Press Ctrl + c to exit this server...")
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind(("", UDP_PORT))
 
     while True:
-        print('Waiting for clients...')
+        # print('Waiting for clients...')
         data, ip = s.recvfrom(BUFFER_SIZE)
-        print('Handling client: {}'.format(ip))
+        # print('Handling client: {}'.format(ip))
         await handleClient(s, ip, data)
-        print('Handled client: {}'.format(ip))
+        # print('Handled client: {}'.format(ip))
 
 if __name__ == '__main__':
     try:
