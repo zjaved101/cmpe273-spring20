@@ -9,3 +9,28 @@ You will be adding package lost detection and reliable message delivery to UDP.
 * In case of package lost, the client did not receive the acknowledgement back from the server, the client must resend the same package again until you get the acknowledgement.
 * To control the package order, the client will never send the next package until it gets the acknowledegement for the previous one.
 
+# Expected Output
+
+* Starting UDP Server
+
+```
+python3 udp_server.py
+
+Server started at port 4000.
+Accepting a file upload...
+Upload successfully completed.
+```
+
+* Running UDP Client
+
+```
+python3 udp_client.py
+
+Connected to the server.
+Startig a file (upload.txt) upload...
+Received ack(xxxxxx) from the sevrver.
+Received ack(xxxxxx) from the sevrver.
+.
+..
+File upload successfully completed.
+```
