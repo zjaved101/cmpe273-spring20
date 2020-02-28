@@ -27,7 +27,7 @@ Upload successfully completed.
 python3 udp_client.py
 
 Connected to the server.
-Startig a file (upload.txt) upload...
+Starting a file (upload.txt) upload...
 Received ack(xxxxxx) from the server.
 Received ack(xxxxxx) from the server.
 .
