@@ -22,7 +22,7 @@ Received data:B:ping
 Received data:A:ping
 Received data:B:ping
 Received data:A:ping
-Received data:B:
+Received data:B:ping
 ...
 ```
 
