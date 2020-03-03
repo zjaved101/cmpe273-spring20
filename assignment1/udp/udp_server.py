@@ -20,9 +20,6 @@ def listen_forever():
 async def handleClient(udpSocket, ip, data):
     print("{}: {}".format(ip, data.decode(encoding="utf-8").strip()))
     split = data.decode().split(':')
-    # print("SEQUENCE: {}".format(split[1]))
-    # udpSocket.sendto(split[1].encode(), ip)
-    # split = ['1','0',split[-1]]
     udpSocket.sendto(':'.join(split[0:2]).encode(), ip)
 
 async def main():
@@ -31,11 +28,8 @@ async def main():
     s.bind(("", UDP_PORT))
 
     while True:
-        # print('Waiting for clients...')
         data, ip = s.recvfrom(BUFFER_SIZE)
-        # print('Handling client: {}'.format(ip))
         await handleClient(s, ip, data)
-        # print('Handled client: {}'.format(ip))
 
 if __name__ == '__main__':
     try:
