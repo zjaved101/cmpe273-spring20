@@ -1,22 +1,21 @@
 import socket
 import asyncio
+import os
 
 UDP_IP = '127.0.0.1'
 UDP_PORT = 4000
 BUFFER_SIZE = 1024
 MESSAGE = "pong"
 FILE_DATA = {}
+FILE = "upload.txt"
 
-# def listen_forever():
-#     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#     s.bind(("", UDP_PORT))
+def writeDataToFile(id):
+    if not os.path.exists("output"):
+        os.mkdir("output")
 
-#     while True:
-#         # get the data sent to us
-#         data, ip = s.recvfrom(BUFFER_SIZE)
-#         print("{}: {}".format(ip, data.decode(encoding="utf-8").strip()))
-#         # reply back to the client
-#         s.sendto(MESSAGE.encode(), ip)
+    with open("output/%s" % FILE, 'wb') as f:
+        for data in FILE_DATA[id]["data"]:
+            f.write(data)
 
 async def handleClient(udpSocket, ip, data):
     # print("{}: {}".format(ip, data.decode(encoding="utf-8").strip()))
@@ -24,16 +23,30 @@ async def handleClient(udpSocket, ip, data):
     # udpSocket.sendto(':'.join(split[0:2]).encode(), ip)
 
     split = data.decode().split(':')
-    if split[0] not in FILE_DATA:
-        print("Accepting file upload from client: %s" % split[0])
-        FILE_DATA[split[0]] = {"data" : [], "sequence" : -1}
+    id = split[0]
+    # acknowledgement to client that server is alive
+    if split[1] == "-2":
+        udpSocket.sendto("0".encode(), ip)
+        return
+
+    # acknowledge that file upload is complete
+    if split[1] == "-1":
+        print("Upload successfully completed.")
+        udpSocket.sendto("1".encode(), ip)
+        writeDataToFile(id)
+        return
+
+    if id not in FILE_DATA:
+        print("Accepting file upload from client: %s" % id)
+        FILE_DATA[id] = {"data" : [], "sequence" : 0}
     
     # if sequence is the next sequence, accept incoming file data
-    if int(split[1]) == FILE_DATA["sequence"] + 1:
-        FILE_DATA[split[0]]["data"].append(split[2])
-        FILE_DATA[split[0]]["sequence"] = int(split[1])
+    if int(split[1]) == FILE_DATA[id]["sequence"] + 1:
+        FILE_DATA[id]["data"].append(split[2])
+        FILE_DATA[id]["sequence"] = int(split[1])
     
-    udpSocket.sendto(':'.join(split[0:2]).encode(), ip)
+    # udpSocket.sendto(':'.join(split[0:2]).encode(), ip)
+    udpSocket.sendto("{}:{}".format(id, FILE_DATA[id]["sequence"]).encode(), ip)
 
 async def main():
     print("Press Ctrl + c to exit this server...")
@@ -41,9 +54,12 @@ async def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind(("", UDP_PORT))
 
-    while True:
-        data, ip = s.recvfrom(BUFFER_SIZE)
-        await handleClient(s, ip, data)
+    try:
+        while True:
+            data, ip = s.recvfrom(BUFFER_SIZE)
+            await handleClient(s, ip, data)
+    except IOError as e:
+        print(e)
 
 if __name__ == '__main__':
     try:
